@@ -530,7 +530,7 @@ function buildHeatmap(faculties) {
   faculties.forEach(f => {
     html += `<tr><td style="padding:5px 10px;white-space:nowrap;font-weight:600;font-size:0.82rem">${f.code}</td>`;
     f.monthly.forEach(v => {
-      const intensity = maxVal>0?v/maxVal:0;
+      const intensity = maxVal > 0 && v > 0 ? Math.log1p(v) / Math.log1p(maxVal) : 0;
       const r=Math.round(59+(255-59)*(1-intensity));
       const g=Math.round(130+(255-130)*(1-intensity));
       const b=Math.round(196+(255-196)*(1-intensity));
