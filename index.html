@@ -281,11 +281,13 @@ footer { text-align: center; padding: 32px; font-size: var(--fs-xs); color: var(
   </div>
 
   <div class="chart-grid-2">
-    <div class="chart-card">
-      <h3>ร้อยละการเบิกจ่าย (ใช้จริง+ผูกพัน) เทียบแผน จำแนกตามคณะ</h3>
-      <p class="chart-subtitle">🔴 >100% เกินงบ &nbsp;|&nbsp; 🟡 <30% ต่ำผิดปกติ &nbsp;|&nbsp; เรียงตามรหัสคณะ</p>
-      <div class="chart-wrap" style="height:260px"><canvas id="pctChart"></canvas></div>
-    </div>
+    <div class="chart-card" style="overflow:hidden">
+  <h3>ร้อยละการเบิกจ่าย (ใช้จริง+ผูกพัน) เทียบแผน จำแนกตามคณะ</h3>
+  <p class="chart-subtitle">🔴 >100% เกินงบ &nbsp;|&nbsp; 🟡 <30% ต่ำผิดปกติ &nbsp;|&nbsp; เรียงตามรหัสคณะ</p>
+  <div style="height:260px; min-height:260px; max-height:260px; overflow:hidden; position:relative">
+    <canvas id="pctChart"></canvas>
+  </div>
+</div>
     <div class="chart-card">
       <h3>Heatmap: ยอดเบิกจ่ายจริงรายเดือน จำแนกตามคณะ (ล้านบาท)</h3>
       <p class="chart-subtitle">สีเข้ม = เบิกจ่ายมาก &nbsp;|&nbsp; สีขาว = ไม่มีการเบิกจ่าย</p>
