@@ -284,7 +284,7 @@ footer { text-align: center; padding: 32px; font-size: var(--fs-xs); color: var(
     <div class="chart-card">
       <h3>ร้อยละการเบิกจ่าย (ใช้จริง+ผูกพัน) เทียบแผน จำแนกตามคณะ</h3>
       <p class="chart-subtitle">🔴 >100% เกินงบ &nbsp;|&nbsp; 🟡 <30% ต่ำผิดปกติ &nbsp;|&nbsp; เรียงตามรหัสคณะ</p>
-      <div class="chart-wrap" style="height:520px"><canvas id="pctChart"></canvas></div>
+      <div class="chart-wrap" style="height:260px"><canvas id="pctChart"></canvas></div>
     </div>
     <div class="chart-card">
       <h3>Heatmap: ยอดเบิกจ่ายจริงรายเดือน จำแนกตามคณะ (ล้านบาท)</h3>
@@ -508,16 +508,26 @@ function buildPctChart(faculties) {
   const colors = data.map(v=>v>100?'#e07070':v<30?'#e8b86a':'#3b82c4');
   mkChart('pctChart', {
     type:'bar',
-    data:{ labels, datasets:[{ label:'% เบิกจ่าย', data, backgroundColor:colors, borderRadius:4, borderWidth:0 }] },
+    data:{ labels, datasets:[{ label:'% เบิกจ่าย', data, backgroundColor:colors, borderRadius:4, borderWidth:0 }]},
     options:{
-      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      responsive:true, maintainAspectRatio:false,
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{title:ctx=>`คณะ ${labels[ctx[0].dataIndex]}`,label:ctx=>` ${ctx.parsed.x.toFixed(2)}%`}}
+        tooltip:{callbacks:{title:ctx=>`คณะ ${labels[ctx[0].dataIndex]}`,label:ctx=>` ${ctx.parsed.y.toFixed(2)}%`}}
       },
       scales:{
-        x:{ max:Math.max(160,...data.map(v=>v+10)), ticks:{font:{size:12},callback:v=>v+'%'}, grid:{color:'#e8f0f9'} },
-        y:{ ticks:{font:{size:12}}, grid:{display:false} }
+        y:{
+          ticks:{font:{size:12},callback:v=>v+'%'}, grid:{color:'#e8f0f9'},
+          afterDraw(chart){
+            const {ctx,chartArea:{left,right},scales:{y}} = chart;
+            const yPos = y.getPixelForValue(100);
+            ctx.save(); ctx.beginPath();
+            ctx.moveTo(left,yPos); ctx.lineTo(right,yPos);
+            ctx.strokeStyle='#e07070'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+            ctx.stroke(); ctx.restore();
+          }
+        },
+        x:{ ticks:{font:{size:11}}, grid:{display:false} }
       }
     }
   });
