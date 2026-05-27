@@ -683,9 +683,13 @@ function buildProgressAndStats(faculties, totalRow) {
   const maxF = faculties.reduce((a,b)=>a.pctDisb>b.pctDisb?a:b);
   const minF = faculties.filter(f=>f.pctDisb>0).reduce((a,b)=>a.pctDisb<b.pctDisb?a:b);
 
-  const stats = [
+  const normalCount = faculties.filter(f=>f.pctDisb>=30&&f.pctDisb<=100).length;
+
+const stats = [
     { label:'Median % เบิกจ่าย', value: median.toFixed(1)+'%', color:'var(--accent-1)' },
+    { label:'Mean % เบิกจ่าย', value: mean.toFixed(1)+'%', color:'var(--accent-2)' },
     { label:'Std. Deviation', value: std.toFixed(1)+'%', color:'var(--text-secondary)' },
+    { label:'คณะที่อยู่ในเกณฑ์ปกติ (30–100%)', value: normalCount+' คณะ', color:'#6abf8e' },
     { label:`สูงสุด — คณะ ${maxF.code}`, value: maxF.pctDisb.toFixed(1)+'%', color:'#e07070' },
     { label:`ต่ำสุด — คณะ ${minF.code}`, value: minF.pctDisb.toFixed(1)+'%', color:'#e8b86a' },
   ];
