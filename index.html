@@ -327,7 +327,7 @@
 </main>
 
 <footer>
-  ข้อมูลดึงโดยตรงจาก Google Sheets สาธารณะ · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้า · จัดทำสำหรับผู้บริหารมหาวิทยาลัยมหิดล
+  ข้อมูลดึงโดยตรงจาก Google Sheets สาธารณะ · อัปเดตอัตโนมัติทุกครั้งที่โหลดหน้า
 </footer>
 
 <script>
@@ -400,7 +400,7 @@ function parseRows(csv) {
 
 function buildKPI(totalRow, faculties) {
   const recentIdx   = getRecentMonthIndex(faculties);
-  const recentLabel = recentIdx >= 0 ? MONTH_LABELS_FULL[recentIdx] : 'ล่าสุด';
+  const recentLabel = MONTH_LABELS_FULL[(new Date().getMonth() + 3) % 12];
 
   const totalBudget = totalRow.budget + totalRow.midYear;
   const totalDisb   = totalRow.totalActComm;
