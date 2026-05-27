@@ -664,6 +664,18 @@ function buildTable(faculties, totalRow) {
 
   document.getElementById('table-body').innerHTML = html;
 
+// sync top scrollbar — wait for render
+setTimeout(() => {
+  const bottom = document.getElementById('table-scroll-bottom');
+  const topInner = document.getElementById('table-scroll-top-inner');
+  const top = document.getElementById('table-scroll-top');
+
+  topInner.style.width = bottom.scrollWidth + 'px';
+
+  top.addEventListener('scroll', () => { bottom.scrollLeft = top.scrollLeft; });
+  bottom.addEventListener('scroll', () => { top.scrollLeft = bottom.scrollLeft; });
+}, 100);
+
 // sync top scrollbar
 const bottom = document.getElementById('table-scroll-bottom');
 const topInner = document.getElementById('table-scroll-top-inner');
