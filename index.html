@@ -302,7 +302,10 @@ footer { text-align: center; padding: 32px; font-size: var(--fs-xs); color: var(
       <h3>รายละเอียดการเบิกจ่ายงบเงินอุดหนุน จำแนกตามคณะ/ส่วนงาน</h3>
       <span style="font-size:var(--fs-xs);color:var(--text-muted)">เรียงตามรหัสคณะ · ตัวเลขแสดงเต็ม (บาท)</span>
     </div>
-    <div class="table-wrap">
+    <div id="table-scroll-top" style="overflow-x:auto;overflow-y:hidden;height:20px">
+  <div id="table-scroll-top-inner"></div>
+</div>
+<div class="table-wrap" id="table-scroll-bottom">
       <table id="data-table">
         <thead id="table-head"></thead>
         <tbody id="table-body"></tbody>
@@ -660,6 +663,18 @@ function buildTable(faculties, totalRow) {
   });
 
   document.getElementById('table-body').innerHTML = html;
+
+// sync top scrollbar
+const bottom = document.getElementById('table-scroll-bottom');
+const topInner = document.getElementById('table-scroll-top-inner');
+const top = document.getElementById('table-scroll-top');
+
+topInner.style.width = bottom.scrollWidth + 'px';
+
+top.addEventListener('scroll', () => { bottom.scrollLeft = top.scrollLeft; });
+bottom.addEventListener('scroll', () => { top.scrollLeft = bottom.scrollLeft; });
+  
+  
 }
 
 async function loadData() {
