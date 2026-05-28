@@ -561,6 +561,15 @@ function mkChart(id, cfg) {
 }
 
 function getRecentMonthIndex(faculties) {
+  // Use the month with the highest TOTAL disbursement across all faculties,
+  // searching from the end — avoids one stray faculty value skewing the result.
+  // We require at least 30% of faculties to have data in that month.
+  const threshold = Math.max(1, Math.floor(faculties.length * 0.30));
+  for (let i = MONTHS.length - 1; i >= 0; i--) {
+    const count = faculties.filter(f => f.monthly[i] > 0).length;
+    if (count >= threshold) return i;
+  }
+  // fallback: any month with any data
   for (let i = MONTHS.length - 1; i >= 0; i--) {
     if (faculties.some(f => f.monthly[i] > 0)) return i;
   }
@@ -576,21 +585,33 @@ function parseRows(csv) {
     const cat = (r[1]||'').trim();
     const code = parseFloat(codeRaw.replace(/,/g,''));
     if (codeRaw.includes('รวมมหาวิทยาลัย')) {
+      const budget = num(r[2]), midYear = num(r[4]);
+      const totalBudget = budget + midYear;
+      const totalActComm = num(r[6]);
+      const committed = num(r[19]);
+      // Compute pctDisb ourselves — don't trust the sheet column (may be 0–1 scale or wrong col)
+      let pctDisb = num(r[5]);
+      if (pctDisb > 0 && pctDisb <= 1) pctDisb = pctDisb * 100; // normalize 0-1 → 0-100
+      if (pctDisb === 0 && totalBudget > 0) pctDisb = totalActComm / totalBudget * 100;
       totalRow = {
         code: 0, name: 'รวมมหาวิทยาลัยมหิดล',
-        budget: num(r[2]), midYear: num(r[4]),
-        pctDisb: num(r[5]), totalActComm: num(r[6]),
+        budget, midYear, pctDisb, totalActComm,
         monthly: MONTHS.map((_,i) => num(r[7+i])),
-        committed: num(r[19])
+        committed
       };
       continue;
     }
     if (!isNaN(code) && code > 0 && cat === 'รวมงบเงินอุดหนุน') {
+      const budget = num(r[2]), midYear = num(r[4]);
+      const totalBudget = budget + midYear;
+      const totalActComm = num(r[6]);
+      let pctDisb = num(r[5]);
+      if (pctDisb > 0 && pctDisb <= 1) pctDisb = pctDisb * 100;
+      if (pctDisb === 0 && totalBudget > 0) pctDisb = totalActComm / totalBudget * 100;
       faculties.push({
         code,
         name: `คณะ/ส่วนงาน ${codeRaw}`,
-        budget: num(r[2]), midYear: num(r[4]),
-        pctDisb: num(r[5]), totalActComm: num(r[6]),
+        budget, midYear, pctDisb, totalActComm,
         monthly: MONTHS.map((_,i) => num(r[7+i])),
         committed: num(r[19])
       });
