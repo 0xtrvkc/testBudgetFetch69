@@ -904,8 +904,9 @@ function buildDistributionChart(faculties) {
         { val: mean,   color: '#3b82c4', dash: [7,4], label: `Mean ${mean.toFixed(1)}%` },
         { val: median, color: '#2a7a50', dash: [4,4], label: `Median ${median.toFixed(1)}%` }
       ];
-      lines.forEach(({ val, color, dash, label }) => {
-        // Map pct value to pixel: bin index = val/BIN, centre of that bin
+      // Sort lines left→right so stagger is predictable
+      const sorted = [...lines].sort((a,b) => a.val - b.val);
+      sorted.forEach(({ val, color, dash, label }, i) => {
         const binIdx = Math.min(val / BIN - 0.5, bins.length - 1);
         const px = x.getPixelForValue(binIdx);
         ctx.save();
@@ -916,12 +917,20 @@ function buildDistributionChart(faculties) {
         ctx.moveTo(px, top);
         ctx.lineTo(px, bottom);
         ctx.stroke();
-        // Label
+        // Stagger labels vertically: first line at top+16, second at top+34
+        const labelY = top + 16 + i * 20;
+        const side = px > chart.chartArea.right * 0.72 ? 'right' : 'left';
+        const labelX = px + (side === 'left' ? 6 : -6);
         ctx.setLineDash([]);
-        ctx.fillStyle = color;
         ctx.font = 'bold 12px IBM Plex Sans Thai, sans-serif';
-        ctx.textAlign = px > chart.width * 0.7 ? 'right' : 'left';
-        ctx.fillText(label, px + (ctx.textAlign === 'left' ? 5 : -5), top + 14);
+        ctx.textAlign = side;
+        // White background box for readability
+        const tw = ctx.measureText(label).width;
+        const bx = side === 'left' ? labelX - 2 : labelX - tw - 2;
+        ctx.fillStyle = 'rgba(255,255,255,0.82)';
+        ctx.fillRect(bx, labelY - 13, tw + 4, 16);
+        ctx.fillStyle = color;
+        ctx.fillText(label, labelX, labelY);
         ctx.restore();
       });
     }
