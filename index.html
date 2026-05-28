@@ -492,6 +492,15 @@ footer { text-align: center; padding: 32px; font-size: var(--fs-xs); color: var(
 
   </div><!-- /progress-card -->
 
+  <!-- ─── DISTRIBUTION CHART ───────────────── -->
+  <div class="section-label">การกระจายตัวของ % เบิกจ่าย จำแนกตามคณะ</div>
+  <div class="chart-full chart-card" style="margin-bottom:28px">
+    <h3>Histogram + KDE — การกระจายตัวของ % เบิกจ่าย</h3>
+    <p class="chart-subtitle">แท่งสีฟ้า = จำนวนคณะในแต่ละช่วง % &nbsp;|&nbsp; เส้นโค้งสีแดง = รูปร่างการกระจายจริง (KDE) &nbsp;|&nbsp; เส้นปะ = Mean &amp; Median</p>
+    <div class="chart-wrap" style="height:360px"><canvas id="distChart"></canvas></div>
+    <div id="dist-insight" style="margin-top:16px;padding:12px 16px;background:var(--surface-2);border-radius:8px;font-size:var(--fs-xs);color:var(--text-secondary);line-height:1.7"></div>
+  </div>
+
   <!-- ─── KPI OVERVIEW ───────────────────────── -->
   <div class="section-label">ภาพรวมมหาวิทยาลัย</div>
   <div class="kpi-grid" id="kpi-grid"></div>
@@ -835,6 +844,156 @@ function buildTable(faculties, totalRow) {
   document.getElementById('table-body').innerHTML = html;
 }
 
+/* ─── Distribution: Histogram + KDE ─── */
+function buildDistributionChart(faculties) {
+  const vals = faculties.map(f => f.pctDisb).filter(v => v > 0);
+  if (vals.length === 0) return;
+
+  const mean   = vals.reduce((s,v) => s+v, 0) / vals.length;
+  const median = [...vals].sort((a,b)=>a-b)[Math.floor(vals.length/2)];
+  const std    = Math.sqrt(vals.reduce((s,v) => s + Math.pow(v-mean,2), 0) / vals.length);
+
+  // Build histogram bins (width = 10%)
+  const BIN = 10;
+  const minV = 0, maxV = Math.ceil(Math.max(...vals) / BIN) * BIN;
+  const bins = [];
+  for (let lo = minV; lo < maxV; lo += BIN) bins.push({ lo, hi: lo+BIN, count: 0, faculties: [] });
+  vals.forEach((v, i) => {
+    const b = bins[Math.min(Math.floor(v / BIN), bins.length - 1)];
+    if (b) { b.count++; b.faculties.push(faculties.filter(f=>f.pctDisb>0)[i]); }
+  });
+
+  const binLabels = bins.map(b => `${b.lo}–${b.hi}%`);
+  const binCounts = bins.map(b => b.count);
+  const binColors = bins.map(b => {
+    const mid = (b.lo + b.hi) / 2;
+    if (mid > 100) return 'rgba(224,112,112,0.75)';   // over budget
+    if (mid < 30)  return 'rgba(232,184,106,0.75)';   // very low
+    return 'rgba(59,130,196,0.72)';                   // normal
+  });
+
+  // KDE: Gaussian kernel, bandwidth = Silverman's rule
+  const h = 1.06 * std * Math.pow(vals.length, -0.2);
+  const kdePoints = 120;
+  const kdeMin = Math.max(0, minV - BIN);
+  const kdeMax = maxV + BIN;
+  const kdeStep = (kdeMax - kdeMin) / kdePoints;
+  const kdeX = [], kdeY = [];
+  for (let i = 0; i <= kdePoints; i++) {
+    const x = kdeMin + i * kdeStep;
+    const y = vals.reduce((s, v) => s + Math.exp(-0.5 * Math.pow((x-v)/h, 2)) / (h * Math.sqrt(2*Math.PI)), 0) / vals.length;
+    kdeX.push(x);
+    kdeY.push(y * vals.length * BIN); // scale to match histogram y-axis (count)
+  }
+
+  mkChart('distChart', {
+    type: 'bar',
+    data: {
+      labels: binLabels,
+      datasets: [
+        {
+          type: 'bar',
+          label: 'จำนวนคณะ',
+          data: binCounts,
+          backgroundColor: binColors,
+          borderColor: binColors.map(c => c.replace('0.72','1').replace('0.75','1')),
+          borderWidth: 1.5,
+          borderRadius: 4,
+          order: 2,
+          yAxisID: 'y'
+        },
+        {
+          type: 'line',
+          label: 'KDE (รูปร่างการกระจายจริง)',
+          data: kdeX.map((x, i) => ({ x, y: kdeY[i] })),
+          borderColor: '#c0392b',
+          backgroundColor: 'rgba(192,57,43,0.08)',
+          borderWidth: 2.5,
+          pointRadius: 0,
+          tension: 0.4,
+          fill: true,
+          order: 1,
+          yAxisID: 'y',
+          parsing: false
+        },
+        {
+          // Mean vertical line — fake scatter with two points
+          type: 'line',
+          label: `Mean (${mean.toFixed(1)}%)`,
+          data: [{ x: mean, y: 0 }, { x: mean, y: Math.max(...kdeY) * 1.15 }],
+          borderColor: '#3b82c4',
+          borderWidth: 2,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          order: 0,
+          yAxisID: 'y',
+          parsing: false
+        },
+        {
+          // Median vertical line
+          type: 'line',
+          label: `Median (${median.toFixed(1)}%)`,
+          data: [{ x: median, y: 0 }, { x: median, y: Math.max(...kdeY) * 1.15 }],
+          borderColor: '#2a7a50',
+          borderWidth: 2,
+          borderDash: [4, 4],
+          pointRadius: 0,
+          order: 0,
+          yAxisID: 'y',
+          parsing: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { font: { size: 13 }, boxWidth: 24 } },
+        tooltip: {
+          callbacks: {
+            title: ctx => ctx[0]?.dataset?.type === 'bar' ? `ช่วง ${ctx[0].label}` : '',
+            label: ctx => {
+              if (ctx.dataset.type === 'bar') {
+                const b = bins[ctx.dataIndex];
+                const names = (b?.faculties||[]).map(f=>`คณะ ${f.code} (${f.pctDisb.toFixed(1)}%)`).join(', ');
+                return [`${ctx.parsed.y} คณะ`, names ? `  ${names}` : ''];
+              }
+              return ctx.dataset.label;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'category',
+          ticks: { font: { size: 12 }, maxRotation: 45 },
+          grid: { display: false },
+          title: { display: true, text: '% เบิกจ่าย', font: { size: 13 } }
+        },
+        y: {
+          ticks: { font: { size: 12 }, stepSize: 1 },
+          grid: { color: '#e8f0f9' },
+          title: { display: true, text: 'จำนวนคณะ', font: { size: 13 } }
+        }
+      }
+    }
+  });
+
+  // Auto-insight text
+  const skew = mean > median ? 'เบ้ขวา (right-skewed)' : mean < median ? 'เบ้ซ้าย (left-skewed)' : 'สมมาตร';
+  const skewExplain = mean > median
+    ? 'มีคณะที่เบิกจ่ายสูงผิดปกติดึง Mean ขึ้น — Median สะท้อนคณะทั่วไปได้ดีกว่า'
+    : mean < median ? 'มีคณะที่เบิกจ่ายต่ำผิดปกติดึง Mean ลง'
+    : 'Mean และ Median ใกล้เคียงกัน การกระจายค่อนข้างสมมาตร';
+  const overCount  = vals.filter(v => v > 100).length;
+  const underCount = vals.filter(v => v < 30).length;
+  document.getElementById('dist-insight').innerHTML =
+    `📊 <strong>การแปลผล:</strong> การกระจายมีลักษณะ <strong>${skew}</strong> — ${skewExplain} &nbsp;·&nbsp; `+
+    `Std Dev = <strong>${std.toFixed(1)}%</strong> บ่งชี้ความเหลื่อมล้ำสูงระหว่างคณะ &nbsp;·&nbsp; `+
+    (overCount  ? `<span style="color:var(--danger)">⚠ ${overCount} คณะเกินงบ (&gt;100%)</span> &nbsp;·&nbsp; ` : '') +
+    (underCount ? `<span style="color:var(--warning)">⚠ ${underCount} คณะเบิกจ่ายต่ำมาก (&lt;30%)</span>` : '✓ ไม่มีคณะต่ำกว่า 30%');
+}
+
 /* ─── Main load ─── */
 async function loadData() {
   document.getElementById('last-updated').textContent = 'กำลังโหลด…';
@@ -845,6 +1004,7 @@ async function loadData() {
     if (!totalRow || faculties.length === 0) throw new Error('ไม่พบข้อมูลในชีต');
 
     buildProgressCard(faculties, totalRow);
+    buildDistributionChart(faculties);
     buildKPI(totalRow, faculties);
     buildMonthlyTrend(faculties);
     buildPctChart(faculties);
