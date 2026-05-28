@@ -18,7 +18,7 @@
   --accent-3: #a8cef0;
   --accent-4: #c9e0f7;
   --text-primary: #1a2e44;
-  --text-secondary:#4a6a8a;
+  --text-secondary: #4a6a8a;
   --text-muted: #7a9ab8;
   --danger: #e07070;
   --warning: #e8b86a;
@@ -46,6 +46,7 @@ body {
   min-height: 100vh;
   padding-bottom: 60px;
 }
+
 /* ─── HEADER ─────────────────────────────────── */
 header {
   background: linear-gradient(135deg, #1a3a5c 0%, #2a5c8c 60%, #3b82c4 100%);
@@ -71,11 +72,7 @@ header {
   line-height: 1.2;
   color: #fff;
 }
-.header-title p {
-  font-size: var(--fs-sm);
-  color: rgba(255,255,255,0.72);
-  margin-top: 4px;
-}
+.header-title p { font-size: var(--fs-sm); color: rgba(255,255,255,0.72); margin-top: 4px; }
 .header-meta { display: flex; align-items: center; gap: 20px; }
 #last-updated {
   font-size: var(--fs-xs);
@@ -97,6 +94,7 @@ header {
   transition: background 0.2s;
 }
 .refresh-btn:hover { background: rgba(255,255,255,0.30); }
+
 /* ─── LOADER ─────────────────────────────────── */
 #loader {
   position: fixed; inset: 0;
@@ -116,8 +114,10 @@ header {
   animation: spin 0.9s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
 /* ─── MAIN LAYOUT ────────────────────────────── */
 main { max-width: 1600px; margin: 0 auto; padding: 36px 32px 0; }
+
 /* ─── SECTION LABEL ──────────────────────────── */
 .section-label {
   font-size: var(--fs-xs);
@@ -129,6 +129,7 @@ main { max-width: 1600px; margin: 0 auto; padding: 36px 32px 0; }
   display: flex; align-items: center; gap: 10px;
 }
 .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
 /* ─── KPI CARDS ──────────────────────────────── */
 .kpi-grid {
   display: grid;
@@ -153,64 +154,151 @@ main { max-width: 1600px; margin: 0 auto; padding: 36px 32px 0; }
   position: absolute; top: 0; left: 0; right: 0; height: 4px;
   background: var(--kpi-accent, var(--accent-1));
 }
-.kpi-label {
-  font-size: var(--fs-xs);
-  color: var(--text-secondary);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  margin-top: 4px;
-  line-height: 1.4;
-}
-.kpi-value {
-  font-family: var(--font-display);
-  font-size: clamp(1.1rem, 1.8vw, 1.75rem);
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1.2;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  hyphens: auto;
-}
-.kpi-sub {
-  font-size: var(--fs-xs);
-  color: var(--text-muted);
-  line-height: 1.5;
-  word-break: break-word;
-}
-.kpi-badge {
-  display: inline-flex; align-items: center;
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 12px;
-  align-self: flex-start;
-}
+.kpi-label { font-size: var(--fs-xs); color: var(--text-secondary); font-weight: 600; letter-spacing: 0.5px; margin-top: 4px; line-height: 1.4; }
+.kpi-value { font-family: var(--font-display); font-size: clamp(1.1rem, 1.8vw, 1.75rem); font-weight: 700; color: var(--text-primary); line-height: 1.2; word-break: break-word; overflow-wrap: break-word; hyphens: auto; }
+.kpi-sub { font-size: var(--fs-xs); color: var(--text-muted); line-height: 1.5; word-break: break-word; }
+.kpi-badge { display: inline-flex; align-items: center; font-size: var(--fs-xs); font-weight: 700; padding: 3px 10px; border-radius: 12px; align-self: flex-start; }
 .badge-warn { background: #fef3e2; color: #b07a20; }
 .badge-ok { background: #e6f7ef; color: #2a7a50; }
 .badge-alert { background: #fdeaea; color: #b03030; }
+
+/* ─── PROGRESS CARD ──────────────────────────── */
+.progress-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  margin-bottom: 28px;
+}
+.progress-card h3 { font-size: var(--fs-md); font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
+.prog-bar-row { margin-bottom: 14px; }
+.prog-bar-label { display: flex; justify-content: space-between; align-items: center; font-size: var(--fs-xs); color: var(--text-secondary); margin-bottom: 6px; }
+.prog-bar-label strong { font-weight: 700; }
+.prog-track { background: var(--accent-4); border-radius: 7px; height: 16px; overflow: hidden; }
+.prog-track.target-track { background: #e0e6ee; }
+.prog-fill { height: 100%; border-radius: 7px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+.prog-fill.actual-fill { background: linear-gradient(90deg, #3b82c4, #6faed9); }
+.prog-fill.target-fill { background: #b0b8c4; }
+.gap-badge {
+  display: inline-block;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  padding: 6px 18px;
+  border-radius: 20px;
+  margin: 14px 0 24px;
+}
+.gap-behind { background: #fdeaea; color: #b03030; }
+.gap-ahead  { background: #e6f7ef; color: #2a7a50; }
+
+/* stats grid inside progress card */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 4px;
+}
+.stat-cell {
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 16px 18px;
+  position: relative;
+}
+.stat-cell-label { font-size: var(--fs-xs); color: var(--text-secondary); margin-bottom: 4px; line-height: 1.4; }
+.stat-cell-value { font-family: var(--font-display); font-size: var(--fs-xl); font-weight: 700; line-height: 1.2; }
+.stat-cell-value.blue  { color: var(--accent-1); }
+.stat-cell-value.red   { color: var(--danger); }
+.stat-cell-value.amber { color: #c07020; }
+.stat-cell-value.green { color: var(--success); }
+
+/* tooltip/explanation popover */
+.stat-cell .info-btn {
+  position: absolute; top: 12px; right: 12px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--accent-4);
+  color: var(--accent-1);
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.stat-cell .info-btn:hover { background: var(--accent-3); }
+.stat-cell .info-popover {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0; right: 0;
+  background: #1a2e44;
+  color: #e8f0f9;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  padding: 12px 14px;
+  border-radius: 8px;
+  z-index: 50;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+}
+.stat-cell .info-popover::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 18px;
+  border: 7px solid transparent;
+  border-top-color: #1a2e44;
+}
+.stat-cell .info-btn:focus + .info-popover,
+.stat-cell:hover .info-popover { display: block; }
+
+/* stats section label inside card */
+.stats-section-label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent-1);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.stats-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* explanation box */
+.explanation-box {
+  background: linear-gradient(135deg, #eef5fc 0%, #f4f9ff 100%);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent-1);
+  border-radius: 0 10px 10px 0;
+  padding: 16px 20px;
+  margin-top: 20px;
+  font-size: var(--fs-xs);
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+.explanation-box strong { color: var(--text-primary); font-weight: 700; }
+.explanation-box .exp-title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--accent-1);
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.exp-row { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.05); align-items: flex-start; }
+.exp-row:last-child { border-bottom: none; }
+.exp-term { min-width: 210px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; }
+.exp-def { flex: 1; }
+
 /* ─── CHART CARDS ────────────────────────────── */
 .chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
 .chart-full { margin-bottom: 28px; }
-.chart-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px;
-  box-shadow: var(--shadow);
-  display: flex; flex-direction: column;
-}
+.chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
 .chart-card h3 { font-size: var(--fs-md); font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
 .chart-card .chart-subtitle { font-size: var(--fs-xs); color: var(--text-muted); margin-bottom: 20px; }
 .chart-wrap { position: relative; flex: 1; }
+
 /* ─── ANOMALY ────────────────────────────────── */
 .anomaly-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
-.anomaly-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px;
-  box-shadow: var(--shadow);
-}
+.anomaly-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
 .anomaly-card h3 { font-size: var(--fs-md); font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
 .icon-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 .anomaly-list { list-style: none; }
@@ -218,11 +306,12 @@ main { max-width: 1600px; margin: 0 auto; padding: 36px 32px 0; }
 .anomaly-item:last-child { border-bottom: none; }
 .anomaly-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
 .icon-over { background: #fdeaea; }
-.icon-low { background: #fef3e2; }
+.icon-low  { background: #fef3e2; }
 .icon-zero { background: #ececec; }
 .icon-spike { background: #e8f7ff; }
 .anomaly-body strong { font-weight: 700; display: block; margin-bottom: 2px; }
 .anomaly-body span { color: var(--text-muted); font-size: var(--fs-xs); }
+
 /* ─── DATA TABLE ─────────────────────────────── */
 .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 28px; }
 .table-header { padding: 24px 28px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
@@ -244,13 +333,21 @@ tbody tr:hover { background: #f4f9ff; }
 .pct-bar-fill.over { background: var(--danger); }
 .pct-num { font-weight: 700; min-width: 52px; font-size: var(--fs-xs); }
 .over-text { color: var(--danger); font-weight: 700; }
-.low-text { color: var(--warning); font-weight: 600; }
+.low-text  { color: var(--warning); font-weight: 600; }
+
 footer { text-align: center; padding: 32px; font-size: var(--fs-xs); color: var(--text-muted); }
+
 @media (max-width: 1100px) { .chart-grid-2, .anomaly-grid { grid-template-columns: 1fr; } }
-@media (max-width: 700px) { header { padding: 24px 20px; } main { padding: 20px 14px 0; } }
+@media (max-width: 700px) {
+  header { padding: 24px 20px; }
+  main { padding: 20px 14px 0; }
+  .exp-row { flex-direction: column; gap: 2px; }
+  .exp-term { min-width: unset; }
+}
 </style>
 </head>
 <body>
+
 <div id="loader">
   <div class="spinner"></div>
   <span>กำลังโหลดข้อมูลจาก Google Sheets…</span>
@@ -270,9 +367,136 @@ footer { text-align: center; padding: 32px; font-size: var(--fs-xs); color: var(
 </header>
 
 <main id="main" style="display:none">
-  <div class="section-label" style="margin-top:8px">ภาพรวมมหาวิทยาลัย</div>
+
+  <!-- ─── PROGRESS VS TARGET ─────────────────── -->
+  <div class="section-label" style="margin-top:8px">ความคืบหน้าเทียบเป้าหมายสิ้นปี</div>
+  <div class="progress-card">
+    <h3>เปรียบเทียบ % เบิกจ่ายจริง vs % ที่ควรเบิกจ่าย ณ เดือนนี้</h3>
+
+    <div class="prog-bar-row">
+      <div class="prog-bar-label">
+        <span>เบิกจ่ายจริง (จริง + ผูกพัน)</span>
+        <strong id="prog-actual-pct" style="color:var(--accent-1)">—</strong>
+      </div>
+      <div class="prog-track">
+        <div class="prog-fill actual-fill" id="prog-actual-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="prog-bar-row">
+      <div class="prog-bar-label">
+        <span id="prog-target-label">เป้าหมาย ณ เดือนนี้ (—/12 เดือน)</span>
+        <strong id="prog-target-pct" style="color:var(--text-muted)">—</strong>
+      </div>
+      <div class="prog-track target-track">
+        <div class="prog-fill target-fill" id="prog-target-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="prog-gap-badge" class="gap-badge gap-behind">— ช้ากว่าเป้า</div>
+
+    <!-- Stats section -->
+    <div class="stats-section-label">สถิติสรุป % เบิกจ่าย จำแนกตามคณะ</div>
+    <div class="stats-grid">
+
+      <div class="stat-cell">
+        <div class="stat-cell-label">Median % เบิกจ่าย</div>
+        <div class="stat-cell-value blue" id="stat-median">—</div>
+        <button class="info-btn" tabindex="0">?</button>
+        <div class="info-popover">
+          <strong>Median (ค่ากลาง)</strong><br>
+          ค่าที่อยู่ตรงกลางเมื่อเรียงคณะทุกคณะตาม % เบิกจ่าย — ครึ่งหนึ่งอยู่เหนือ ครึ่งหนึ่งอยู่ใต้ค่านี้
+          ใช้แทน Mean เมื่อข้อมูลมีค่าสุดโต่ง เพราะไม่ถูกดึงให้เบี้ยว
+        </div>
+      </div>
+
+      <div class="stat-cell">
+        <div class="stat-cell-label">Mean % เบิกจ่าย</div>
+        <div class="stat-cell-value blue" id="stat-mean">—</div>
+        <button class="info-btn" tabindex="0">?</button>
+        <div class="info-popover">
+          <strong>Mean (ค่าเฉลี่ย)</strong><br>
+          ผลรวม % เบิกจ่ายของทุกคณะ หารด้วยจำนวนคณะ
+          ถ้า Mean สูงกว่า Median มาก แสดงว่ามีคณะที่เบิกจ่ายสูงผิดปกติ (outlier) ดึงค่าเฉลี่ยขึ้น
+        </div>
+      </div>
+
+      <div class="stat-cell">
+        <div class="stat-cell-label">Std. Deviation (ความแปรปรวน)</div>
+        <div class="stat-cell-value" id="stat-std" style="color:var(--text-primary)">—</div>
+        <button class="info-btn" tabindex="0">?</button>
+        <div class="info-popover">
+          <strong>Std. Deviation (ส่วนเบี่ยงเบนมาตรฐาน)</strong><br>
+          วัดว่าคณะต่าง ๆ "กระจาย" แค่ไหนรอบค่าเฉลี่ย
+          ค่าสูง → คณะมีความเหลื่อมล้ำมาก บางคณะเร็วมาก บางคณะช้ามาก
+          ค่าต่ำ → คณะส่วนใหญ่เบิกจ่ายใกล้เคียงกัน
+        </div>
+      </div>
+
+      <div class="stat-cell">
+        <div class="stat-cell-label">คณะที่อยู่ในเกณฑ์ปกติ (30–100%)</div>
+        <div class="stat-cell-value green" id="stat-normal">—</div>
+        <button class="info-btn" tabindex="0">?</button>
+        <div class="info-popover">
+          <strong>Normal Range (30–100%)</strong><br>
+          จำนวนคณะที่มี % เบิกจ่ายอยู่ในช่วงที่ยอมรับได้
+          ต่ำกว่า 30% = ช้าเกินไป, สูงกว่า 100% = เบิกจ่ายเกินงบ
+          ยิ่งมากยิ่งดี
+        </div>
+      </div>
+
+      <div class="stat-cell">
+        <div class="stat-cell-label">สูงสุด — <span id="stat-max-label">—</span></div>
+        <div class="stat-cell-value red" id="stat-max">—</div>
+        <button class="info-btn" tabindex="0">?</button>
+        <div class="info-popover">
+          <strong>ค่าสูงสุด (Max)</strong><br>
+          คณะที่มี % เบิกจ่ายสูงที่สุดในมหาวิทยาลัย
+          หากเกิน 100% แสดงว่าคณะนั้นเบิกจ่ายเกินงบที่ได้รับ — ต้องตรวจสอบ
+        </div>
+      </div>
+
+      <div class="stat-cell">
+        <div class="stat-cell-label">ต่ำสุด — <span id="stat-min-label">—</span></div>
+        <div class="stat-cell-value amber" id="stat-min">—</div>
+        <button class="info-btn" tabindex="0">?</button>
+        <div class="info-popover">
+          <strong>ค่าต่ำสุด (Min)</strong><br>
+          คณะที่มี % เบิกจ่ายต่ำที่สุด (ไม่นับคณะที่ยังไม่มีข้อมูล)
+          ค่าต่ำมากในเดือนหลัง ๆ ของปีงบประมาณ อาจหมายความว่างบประมาณจะไม่ถูกใช้ทัน
+        </div>
+      </div>
+
+    </div><!-- /stats-grid -->
+
+    <!-- Explanation box -->
+    <div class="explanation-box">
+      <div class="exp-title">📖 วิธีอ่านตัวเลขเหล่านี้</div>
+      <div class="exp-row">
+        <span class="exp-term">เบิกจ่ายจริง vs เป้าหมาย</span>
+        <span class="exp-def">เป้าหมายคำนวณจาก <strong>(เดือนปัจจุบัน ÷ 12) × 100%</strong> — ถ้าอยู่เดือน 7 เป้าคือ 58.3% หากเบิกจ่ายจริงต่ำกว่า แปลว่าการใช้งบล่าช้า</span>
+      </div>
+      <div class="exp-row">
+        <span class="exp-term">Mean สูงกว่า Median</span>
+        <span class="exp-def">แสดงว่ามีคณะที่เบิกจ่ายสูงผิดปกติ (เช่น 174%) ดึง Mean ขึ้น ส่วน Median สะท้อนคณะ "ทั่วไป" ได้ดีกว่า</span>
+      </div>
+      <div class="exp-row">
+        <span class="exp-term">Std. Deviation สูง</span>
+        <span class="exp-def">ยิ่งสูง ยิ่งบอกว่าคณะต่าง ๆ เดินหน้าไม่พร้อมกัน — บางคณะวิ่งเร็ว บางคณะแทบไม่เคลื่อน ควรติดตามคณะปลายแถวทั้งสองด้าน</span>
+      </div>
+      <div class="exp-row">
+        <span class="exp-term">Gap (ช้ากว่าเป้า)</span>
+        <span class="exp-def">ส่วนต่างระหว่าง % เบิกจ่ายจริงกับเป้าหมายเดือนปัจจุบัน ค่าติดลบหมายความว่ามหาวิทยาลัยโดยรวมยังใช้งบได้น้อยกว่าที่ควรจะเป็น ณ จุดนี้ของปี</span>
+      </div>
+    </div>
+
+  </div><!-- /progress-card -->
+
+  <!-- ─── KPI OVERVIEW ───────────────────────── -->
+  <div class="section-label">ภาพรวมมหาวิทยาลัย</div>
   <div class="kpi-grid" id="kpi-grid"></div>
 
+  <!-- ─── MONTHLY TREND ─────────────────────── -->
   <div class="section-label">แนวโน้มการเบิกจ่าย</div>
   <div class="chart-full chart-card">
     <h3>การเบิกจ่ายรายเดือน — รวมทุกคณะ (บาท)</h3>
@@ -281,28 +505,11 @@ footer { text-align: center; padding: 32px; font-size: var(--fs-xs); color: var(
   </div>
 
   <div class="chart-grid-2">
-    <div class="chart-card" style="overflow:hidden; display:flex; flex-direction:column; gap:20px;">
-  <div>
-    <h3>ร้อยละการเบิกจ่าย (ใช้จริง+ผูกพัน) เทียบแผน จำแนกตามคณะ</h3>
-    <p class="chart-subtitle">🔴 >100% เกินงบ &nbsp;|&nbsp; 🟡 <30% ต่ำผิดปกติ &nbsp;|&nbsp; เรียงตามรหัสคณะ</p>
-    <div style="height:260px; min-height:260px; max-height:260px; overflow:hidden; position:relative">
-      <canvas id="pctChart"></canvas>
+    <div class="chart-card">
+      <h3>ร้อยละการเบิกจ่าย (ใช้จริง+ผูกพัน) เทียบแผน จำแนกตามคณะ</h3>
+      <p class="chart-subtitle">🔴 >100% เกินงบ &nbsp;|&nbsp; 🟡 <30% ต่ำผิดปกติ &nbsp;|&nbsp; เรียงตามรหัสคณะ</p>
+      <div class="chart-wrap" style="height:520px"><canvas id="pctChart"></canvas></div>
     </div>
-  </div>
-
-  <!-- Progress toward year-end -->
-  <div>
-    <h3 style="margin-bottom:4px">ความคืบหน้าเทียบเป้าหมายสิ้นปี</h3>
-    <p class="chart-subtitle">เปรียบเทียบ % เบิกจ่ายจริง vs % ที่ควรเบิกจ่าย ณ เดือนนี้</p>
-    <div id="yearProgressWrap"></div>
-  </div>
-
-  <!-- Quick stats -->
-  <div>
-    <h3 style="margin-bottom:12px">สถิติสรุป % เบิกจ่าย จำแนกตามคณะ</h3>
-    <div id="quickStats" style="display:grid; grid-template-columns:1fr 1fr; gap:10px"></div>
-  </div>
-</div>
     <div class="chart-card">
       <h3>Heatmap: ยอดเบิกจ่ายจริงรายเดือน จำแนกตามคณะ (ล้านบาท)</h3>
       <p class="chart-subtitle">สีเข้ม = เบิกจ่ายมาก &nbsp;|&nbsp; สีขาว = ไม่มีการเบิกจ่าย</p>
@@ -310,25 +517,25 @@ footer { text-align: center; padding: 32px; font-size: var(--fs-xs); color: var(
     </div>
   </div>
 
+  <!-- ─── ANOMALIES ─────────────────────────── -->
   <div class="section-label">จุดที่ต้องพิจารณาพิเศษ (Anomalies)</div>
   <div class="anomaly-grid" id="anomaly-grid"></div>
 
+  <!-- ─── FULL TABLE ────────────────────────── -->
   <div class="section-label">ตารางข้อมูลฉบับสมบูรณ์</div>
   <div class="table-card">
     <div class="table-header">
       <h3>รายละเอียดการเบิกจ่ายงบเงินอุดหนุน จำแนกตามคณะ/ส่วนงาน</h3>
       <span style="font-size:var(--fs-xs);color:var(--text-muted)">เรียงตามรหัสคณะ · ตัวเลขแสดงเต็ม (บาท)</span>
     </div>
-    <div id="table-scroll-top" style="overflow-x:auto;overflow-y:hidden;height:20px">
-  <div id="table-scroll-top-inner"></div>
-</div>
-<div class="table-wrap" id="table-scroll-bottom">
+    <div class="table-wrap">
       <table id="data-table">
         <thead id="table-head"></thead>
         <tbody id="table-body"></tbody>
       </table>
     </div>
   </div>
+
 </main>
 
 <footer>
@@ -339,12 +546,8 @@ footer { text-align: center; padding: 32px; font-size: var(--fs-xs); color: var(
 const SHEET_ID = '1WhHmQreskf9TBcJ-CU8KWixB5ou42AlxQN0AzmiXM6g';
 const GID = '100969097';
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`;
-
 const MONTHS = ['ต.ค.','พ.ย.','ธ.ค.','ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.'];
-const MONTH_LABELS_FULL = [
-  'ตุลาคม','พฤศจิกายน','ธันวาคม','มกราคม','กุมภาพันธ์','มีนาคม',
-  'เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน'
-];
+const MONTH_LABELS_FULL = ['ตุลาคม','พฤศจิกายน','ธันวาคม','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน'];
 
 const fmt = n => typeof n==='number'&&!isNaN(n) ? n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}) : '–';
 const pct = n => typeof n==='number'&&!isNaN(n) ? n.toFixed(2)+'%' : '–';
@@ -357,37 +560,21 @@ function mkChart(id, cfg) {
   c._chart = new Chart(c, cfg);
 }
 
-/**
- * Returns the current fiscal month index based on the real calendar date.
- * Thai fiscal year starts in October:
- *   Oct(cal 9) → fiscal 0
- *   Nov(cal 10) → fiscal 1
- *   Dec(cal 11) → fiscal 2
- *   Jan(cal 0)  → fiscal 3
- *   Feb(cal 1)  → fiscal 4
- *   Mar(cal 2)  → fiscal 5
- *   Apr(cal 3)  → fiscal 6
- *   May(cal 4)  → fiscal 7  ← พฤษภาคม
- *   Jun(cal 5)  → fiscal 8
- *   Jul(cal 6)  → fiscal 9
- *   Aug(cal 7)  → fiscal 10
- *   Sep(cal 8)  → fiscal 11
- */
-function getCurrentFiscalMonthIndex() {
-  const calMonth = new Date().getMonth(); // 0 = January, 4 = May, 8 = September, 9 = October
-  return calMonth >= 9 ? calMonth - 9 : calMonth + 2;
+function getRecentMonthIndex(faculties) {
+  for (let i = MONTHS.length - 1; i >= 0; i--) {
+    if (faculties.some(f => f.monthly[i] > 0)) return i;
+  }
+  return -1;
 }
 
 function parseRows(csv) {
   const rows = Papa.parse(csv, { skipEmptyLines: true }).data;
   const faculties = [];
   let totalRow = null;
-
   for (const r of rows) {
     const codeRaw = (r[0]||'').trim();
     const cat = (r[1]||'').trim();
     const code = parseFloat(codeRaw.replace(/,/g,''));
-
     if (codeRaw.includes('รวมมหาวิทยาลัย')) {
       totalRow = {
         code: 0, name: 'รวมมหาวิทยาลัยมหิดล',
@@ -398,7 +585,6 @@ function parseRows(csv) {
       };
       continue;
     }
-
     if (!isNaN(code) && code > 0 && cat === 'รวมงบเงินอุดหนุน') {
       faculties.push({
         code,
@@ -410,15 +596,61 @@ function parseRows(csv) {
       });
     }
   }
-
   faculties.sort((a,b) => a.code - b.code);
   return { faculties, totalRow };
 }
 
-function buildKPI(totalRow, faculties) {
-  const recentIdx = getCurrentFiscalMonthIndex();
-  const recentLabel = MONTH_LABELS_FULL[recentIdx];
+/* ─── Progress vs Target card ─── */
+function buildProgressCard(faculties, totalRow) {
+  const recentIdx = getRecentMonthIndex(faculties);
+  const currentMonth = recentIdx >= 0 ? recentIdx + 1 : 7;
+  const targetPct = (currentMonth / 12) * 100;
+  const actualPct = totalRow.pctDisb;
+  const gap = actualPct - targetPct;
 
+  // animate bars (defer so CSS transition fires)
+  requestAnimationFrame(() => {
+    document.getElementById('prog-actual-bar').style.width = Math.min(100, actualPct) + '%';
+    document.getElementById('prog-target-bar').style.width = Math.min(100, targetPct) + '%';
+  });
+  document.getElementById('prog-actual-pct').textContent = actualPct.toFixed(1) + '%';
+  document.getElementById('prog-target-pct').textContent = targetPct.toFixed(1) + '%';
+  document.getElementById('prog-target-label').textContent = `เป้าหมาย ณ เดือนนี้ (${currentMonth}/12 เดือน)`;
+
+  const badge = document.getElementById('prog-gap-badge');
+  if (gap < 0) {
+    badge.className = 'gap-badge gap-behind';
+    badge.textContent = gap.toFixed(1) + '% ช้ากว่าเป้า';
+  } else {
+    badge.className = 'gap-badge gap-ahead';
+    badge.textContent = '+' + gap.toFixed(1) + '% เร็วกว่าเป้า';
+  }
+
+  // stats
+  const vals = faculties.map(f => f.pctDisb).filter(v => v > 0).sort((a,b) => a - b);
+  const median = vals.length % 2 === 0
+    ? (vals[vals.length/2-1] + vals[vals.length/2]) / 2
+    : vals[Math.floor(vals.length/2)];
+  const mean = vals.reduce((s,v) => s+v, 0) / vals.length;
+  const std  = Math.sqrt(vals.reduce((s,v) => s + Math.pow(v - mean, 2), 0) / vals.length);
+  const normalCount = faculties.filter(f => f.pctDisb >= 30 && f.pctDisb <= 100).length;
+  const maxF = [...faculties].sort((a,b) => b.pctDisb - a.pctDisb)[0];
+  const minF = [...faculties].filter(f => f.pctDisb > 0).sort((a,b) => a.pctDisb - b.pctDisb)[0];
+
+  document.getElementById('stat-median').textContent   = median.toFixed(1) + '%';
+  document.getElementById('stat-mean').textContent     = mean.toFixed(1) + '%';
+  document.getElementById('stat-std').textContent      = std.toFixed(1) + '%';
+  document.getElementById('stat-normal').textContent   = normalCount + ' คณะ';
+  document.getElementById('stat-max-label').textContent = `คณะ ${maxF.code}`;
+  document.getElementById('stat-max').textContent      = maxF.pctDisb.toFixed(1) + '%';
+  document.getElementById('stat-min-label').textContent = `คณะ ${minF.code}`;
+  document.getElementById('stat-min').textContent      = minF.pctDisb.toFixed(1) + '%';
+}
+
+/* ─── KPI cards ─── */
+function buildKPI(totalRow, faculties) {
+  const recentIdx = getRecentMonthIndex(faculties);
+  const recentLabel = recentIdx >= 0 ? MONTH_LABELS_FULL[recentIdx] : 'ล่าสุด';
   const totalBudget = totalRow.budget + totalRow.midYear;
   const totalDisb = totalRow.totalActComm;
   const overallPct = totalBudget > 0 ? (totalDisb / totalBudget * 100) : 0;
@@ -426,55 +658,18 @@ function buildKPI(totalRow, faculties) {
   const actualOnly = totalDisb - committed;
   const numFaculty = faculties.length;
   const overFaculty = faculties.filter(f => f.pctDisb > 100).length;
-
-  // Faculties with no disbursement in the current calendar month
-  const zeroRecent = faculties.filter(f => f.budget > 0 && f.monthly[recentIdx] === 0);
+  const zeroRecent = recentIdx >= 0
+    ? faculties.filter(f => f.budget > 0 && f.monthly[recentIdx] === 0)
+    : faculties.filter(f => f.totalActComm === 0 && f.budget > 0);
 
   const cards = [
-    {
-      label: 'งบประมาณรวม (แผน + กลางปี)',
-      value: fmt(totalBudget),
-      sub: `แผนเดิม ${fmt(totalRow.budget)} บาท + เพิ่มกลางปี ${fmt(totalRow.midYear)} บาท`,
-      accent: '#3b82c4', badge: null
-    },
-    {
-      label: 'ยอดเบิกจ่ายรวม (จริง + ผูกพัน)',
-      value: fmt(totalDisb),
-      sub: `จ่ายจริง ${fmt(actualOnly)} บาท + ผูกพัน ${fmt(committed)} บาท`,
-      accent: '#2a5c8c',
-      badge: { text: pct(overallPct)+' ของงบรวม', cls: overallPct>75?'badge-ok':'badge-warn' }
-    },
-    {
-      label: 'ร้อยละการเบิกจ่ายรวม',
-      value: pct(overallPct),
-      sub: 'เทียบกับงบประมาณทั้งหมด (แผน + กลางปี)',
-      accent: overallPct>80?'#6abf8e':overallPct<40?'#e8b86a':'#6faed9',
-      badge: overallPct<50?{text:'⚠ ต่ำกว่าเป้า',cls:'badge-warn'}:
-             overallPct>100?{text:'⚠ เกินงบ',cls:'badge-alert'}:
-             {text:'✓ อยู่ในเกณฑ์',cls:'badge-ok'}
-    },
-    {
-      label: 'คณะที่เบิกจ่ายเกินงบ (>100%)',
-      value: overFaculty+' คณะ',
-      sub: `จากทั้งหมด ${numFaculty} คณะ/ส่วนงาน`,
-      accent: overFaculty>0?'#e07070':'#6abf8e',
-      badge: overFaculty>0?{text:'ต้องตรวจสอบ',cls:'badge-alert'}:{text:'ปกติ',cls:'badge-ok'}
-    },
-    {
-      label: `คณะที่ยังไม่มีการเบิกจ่ายเลย (${recentLabel})`,
-      value: zeroRecent.length+' คณะ',
-      sub: `คณะที่ไม่มีการเบิกจ่ายในเดือน${recentLabel}`,
-      accent: zeroRecent.length>0?'#e8b86a':'#6abf8e',
-      badge: zeroRecent.length>0?{text:'ต้องติดตาม',cls:'badge-warn'}:null
-    },
-    {
-      label: 'ยอดผูกพัน (ณ ปัจจุบัน)',
-      value: fmt(committed),
-      sub: `คิดเป็น ${committed>0&&totalDisb>0?pct(committed/totalDisb*100):'–'} ของยอดเบิกจ่ายรวม`,
-      accent: '#6faed9', badge: null
-    }
+    { label:'งบประมาณรวม (แผน + กลางปี)', value:fmt(totalBudget), sub:`แผนเดิม ${fmt(totalRow.budget)} บาท + เพิ่มกลางปี ${fmt(totalRow.midYear)} บาท`, accent:'#3b82c4', badge:null },
+    { label:'ยอดเบิกจ่ายรวม (จริง + ผูกพัน)', value:fmt(totalDisb), sub:`จ่ายจริง ${fmt(actualOnly)} บาท + ผูกพัน ${fmt(committed)} บาท`, accent:'#2a5c8c', badge:{ text:pct(overallPct)+' ของงบรวม', cls:overallPct>75?'badge-ok':'badge-warn' } },
+    { label:'ร้อยละการเบิกจ่ายรวม', value:pct(overallPct), sub:'เทียบกับงบประมาณทั้งหมด (แผน + กลางปี)', accent:overallPct>80?'#6abf8e':overallPct<40?'#e8b86a':'#6faed9', badge:overallPct<50?{text:'⚠ ต่ำกว่าเป้า',cls:'badge-warn'}:overallPct>100?{text:'⚠ เกินงบ',cls:'badge-alert'}:{text:'✓ อยู่ในเกณฑ์',cls:'badge-ok'} },
+    { label:'คณะที่เบิกจ่ายเกินงบ (>100%)', value:overFaculty+' คณะ', sub:`จากทั้งหมด ${numFaculty} คณะ/ส่วนงาน`, accent:overFaculty>0?'#e07070':'#6abf8e', badge:overFaculty>0?{text:'ต้องตรวจสอบ',cls:'badge-alert'}:{text:'ปกติ',cls:'badge-ok'} },
+    { label:`คณะที่ยังไม่มีการเบิกจ่าย (${recentLabel})`, value:zeroRecent.length+' คณะ', sub:`ไม่มีการเบิกจ่ายในเดือน${recentLabel}`, accent:zeroRecent.length>0?'#e8b86a':'#6abf8e', badge:zeroRecent.length>0?{text:'ต้องติดตาม',cls:'badge-warn'}:null },
+    { label:'ยอดผูกพัน (ณ ปัจจุบัน)', value:fmt(committed), sub:`คิดเป็น ${committed>0&&totalDisb>0?pct(committed/totalDisb*100):'–'} ของยอดเบิกจ่ายรวม`, accent:'#6faed9', badge:null }
   ];
-
   document.getElementById('kpi-grid').innerHTML = cards.map(c => `
     <div class="kpi-card" style="--kpi-accent:${c.accent}">
       <div class="kpi-label">${c.label}</div>
@@ -484,6 +679,7 @@ function buildKPI(totalRow, faculties) {
     </div>`).join('');
 }
 
+/* ─── Monthly trend chart ─── */
 function buildMonthlyTrend(faculties) {
   const totals = MONTHS.map((_,i) => faculties.reduce((s,f)=>s+(f.monthly[i]||0),0));
   mkChart('monthlyTrendChart', {
@@ -491,27 +687,14 @@ function buildMonthlyTrend(faculties) {
     data: {
       labels: MONTHS,
       datasets: [
-        {
-          label: 'ยอดเบิกจ่ายรายเดือน (บาท)',
-          data: totals,
-          backgroundColor: MONTHS.map((_,i)=>`rgba(59,130,196,${0.5+i*0.04})`),
-          borderColor: '#3b82c4', borderWidth: 2, borderRadius: 6, order: 2
-        },
-        {
-          label: 'แนวโน้ม (Moving Avg 3 เดือน)',
-          data: totals.map((_,i,a)=>{ const s=a.slice(Math.max(0,i-2),i+1); return s.reduce((x,v)=>x+v,0)/s.length; }),
-          type:'line', borderColor:'#e07070', backgroundColor:'transparent',
-          borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#e07070', tension:0.35, order:1
-        }
+        { label:'ยอดเบิกจ่ายรายเดือน (บาท)', data:totals, backgroundColor:MONTHS.map((_,i)=>`rgba(59,130,196,${0.5+i*0.04})`), borderColor:'#3b82c4', borderWidth:2, borderRadius:6, order:2 },
+        { label:'แนวโน้ม (Moving Avg 3 เดือน)', data:totals.map((_,i,a)=>{ const s=a.slice(Math.max(0,i-2),i+1); return s.reduce((x,v)=>x+v,0)/s.length; }), type:'line', borderColor:'#e07070', backgroundColor:'transparent', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#e07070', tension:0.35, order:1 }
       ]
     },
     options: {
       responsive:true, maintainAspectRatio:false,
-      plugins: {
-        legend:{labels:{font:{size:14}}},
-        tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.parsed.y)+' บาท'}}
-      },
-      scales: {
+      plugins:{ legend:{labels:{font:{size:14}}}, tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.parsed.y)+' บาท'}} },
+      scales:{
         y:{ ticks:{font:{size:13},callback:v=>(v/1e6).toFixed(1)+' ล.'}, grid:{color:'#e8f0f9'} },
         x:{ ticks:{font:{size:13}}, grid:{display:false} }
       }
@@ -519,40 +702,29 @@ function buildMonthlyTrend(faculties) {
   });
 }
 
+/* ─── % disbursement bar chart ─── */
 function buildPctChart(faculties) {
   const labels = faculties.map(f=>`${f.code}`);
-  const data = faculties.map(f=>f.pctDisb);
+  const data   = faculties.map(f=>f.pctDisb);
   const colors = data.map(v=>v>100?'#e07070':v<30?'#e8b86a':'#3b82c4');
   mkChart('pctChart', {
     type:'bar',
-    data:{ labels, datasets:[{ label:'% เบิกจ่าย', data, backgroundColor:colors, borderRadius:4, borderWidth:0 }]},
+    data:{ labels, datasets:[{ label:'% เบิกจ่าย', data, backgroundColor:colors, borderRadius:4, borderWidth:0 }] },
     options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{title:ctx=>`คณะ ${labels[ctx[0].dataIndex]}`,label:ctx=>` ${ctx.parsed.y.toFixed(2)}%`}}
-      },
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{title:ctx=>`คณะ ${labels[ctx[0].dataIndex]}`,label:ctx=>` ${ctx.parsed.x.toFixed(2)}%`}} },
       scales:{
-        y:{
-          ticks:{font:{size:12},callback:v=>v+'%'}, grid:{color:'#e8f0f9'},
-          afterDraw(chart){
-            const {ctx,chartArea:{left,right},scales:{y}} = chart;
-            const yPos = y.getPixelForValue(100);
-            ctx.save(); ctx.beginPath();
-            ctx.moveTo(left,yPos); ctx.lineTo(right,yPos);
-            ctx.strokeStyle='#e07070'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
-            ctx.stroke(); ctx.restore();
-          }
-        },
-        x:{ ticks:{font:{size:11}}, grid:{display:false} }
+        x:{ max:Math.max(160,...data.map(v=>v+10)), ticks:{font:{size:12},callback:v=>v+'%'}, grid:{color:'#e8f0f9'} },
+        y:{ ticks:{font:{size:12}}, grid:{display:false} }
       }
     }
   });
 }
 
+/* ─── Heatmap ─── */
 function buildHeatmap(faculties) {
   const allVals = faculties.flatMap(f=>f.monthly);
-  const maxVal = Math.max(...allVals);
+  const maxVal  = Math.max(...allVals);
   let html = '<table style="border-collapse:collapse;width:100%;font-size:0.88rem">';
   html += '<thead><tr><th style="padding:6px 10px;text-align:left;background:#e8f0f9;position:sticky;top:0;z-index:2;white-space:nowrap">คณะ</th>';
   MONTHS.forEach(m => { html += `<th style="padding:6px 8px;background:#e8f0f9;text-align:center;position:sticky;top:0;z-index:2;font-size:0.82rem">${m}</th>`; });
@@ -560,7 +732,7 @@ function buildHeatmap(faculties) {
   faculties.forEach(f => {
     html += `<tr><td style="padding:5px 10px;white-space:nowrap;font-weight:600;font-size:0.82rem">${f.code}</td>`;
     f.monthly.forEach(v => {
-      const intensity = maxVal > 0 && v > 0 ? Math.log1p(v) / Math.log1p(maxVal) : 0;
+      const intensity = maxVal>0?v/maxVal:0;
       const r=Math.round(59+(255-59)*(1-intensity));
       const g=Math.round(130+(255-130)*(1-intensity));
       const b=Math.round(196+(255-196)*(1-intensity));
@@ -573,165 +745,61 @@ function buildHeatmap(faculties) {
   document.getElementById('heatmapTable').innerHTML = html;
 }
 
+/* ─── Anomaly cards ─── */
 function buildAnomalies(faculties) {
-  const recentIdx = getCurrentFiscalMonthIndex();
-  const recentLabel = MONTH_LABELS_FULL[recentIdx];
+  const recentIdx = getRecentMonthIndex(faculties);
+  const recentLabel = recentIdx >= 0 ? MONTH_LABELS_FULL[recentIdx] : 'ล่าสุด';
+  const over100   = faculties.filter(f=>f.pctDisb>100).sort((a,b)=>b.pctDisb-a.pctDisb);
+  const under20   = faculties.filter(f=>f.pctDisb<20&&f.budget>0&&f.pctDisb>0).sort((a,b)=>a.pctDisb-b.pctDisb);
+  const zeroRecent = recentIdx>=0 ? faculties.filter(f=>f.budget>0&&f.monthly[recentIdx]===0) : faculties.filter(f=>f.totalActComm===0&&f.budget>0);
+  const bigComm   = faculties.filter(f=>f.committed>0).sort((a,b)=>b.committed-a.committed).slice(0,6);
 
-  const over100 = faculties.filter(f=>f.pctDisb>100).sort((a,b)=>b.pctDisb-a.pctDisb);
-  const under20 = faculties.filter(f=>f.pctDisb<20&&f.budget>0&&f.pctDisb>0).sort((a,b)=>a.pctDisb-b.pctDisb);
-  const zeroRecent = faculties.filter(f=>f.budget>0&&f.monthly[recentIdx]===0);
-  const bigComm = faculties.filter(f=>f.committed>0).sort((a,b)=>b.committed-a.committed).slice(0,6);
-
-  const grid = document.getElementById('anomaly-grid');
-  grid.innerHTML = `
+  document.getElementById('anomaly-grid').innerHTML = `
     <div class="anomaly-card">
       <h3><span class="icon-dot" style="background:#e07070"></span>คณะที่เบิกจ่ายเกินงบประมาณ (>100%)</h3>
       ${over100.length===0
         ? '<p style="color:var(--text-muted)">ไม่พบคณะที่เบิกจ่ายเกินงบ</p>'
-        : `<ul class="anomaly-list">${over100.map(f=>`
-          <li class="anomaly-item">
-            <div class="anomaly-icon icon-over">🔴</div>
-            <div class="anomaly-body">
-              <strong class="over-text">คณะ ${f.code} — ${pct(f.pctDisb)}</strong>
-              <span>เบิกจ่าย ${fmt(f.totalActComm)} บาท จากงบ ${fmt(f.budget+f.midYear)} บาท</span>
-            </div>
-          </li>`).join('')}</ul>`}
+        : `<ul class="anomaly-list">${over100.map(f=>`<li class="anomaly-item"><div class="anomaly-icon icon-over">🔴</div><div class="anomaly-body"><strong class="over-text">คณะ ${f.code} — ${pct(f.pctDisb)}</strong><span>เบิกจ่าย ${fmt(f.totalActComm)} บาท จากงบ ${fmt(f.budget+f.midYear)} บาท</span></div></li>`).join('')}</ul>`}
     </div>
-
     <div class="anomaly-card">
       <h3><span class="icon-dot" style="background:#e8b86a"></span>คณะที่เบิกจ่ายต่ำผิดปกติ (&lt;20%)</h3>
       ${under20.length===0
         ? '<p style="color:var(--text-muted)">ไม่พบคณะที่เบิกจ่ายต่ำผิดปกติ</p>'
-        : `<ul class="anomaly-list">${under20.map(f=>`
-          <li class="anomaly-item">
-            <div class="anomaly-icon icon-low">⚠️</div>
-            <div class="anomaly-body">
-              <strong class="low-text">คณะ ${f.code} — ${pct(f.pctDisb)}</strong>
-              <span>งบรวม ${fmt(f.budget+f.midYear)} บาท / เบิกจ่ายแล้ว ${fmt(f.totalActComm)} บาท</span>
-            </div>
-          </li>`).join('')}</ul>`}
+        : `<ul class="anomaly-list">${under20.map(f=>`<li class="anomaly-item"><div class="anomaly-icon icon-low">⚠️</div><div class="anomaly-body"><strong class="low-text">คณะ ${f.code} — ${pct(f.pctDisb)}</strong><span>งบรวม ${fmt(f.budget+f.midYear)} บาท / เบิกจ่ายแล้ว ${fmt(f.totalActComm)} บาท</span></div></li>`).join('')}</ul>`}
     </div>
-
     <div class="anomaly-card">
       <h3><span class="icon-dot" style="background:#aaa"></span>คณะที่ยังไม่มีการเบิกจ่ายเลย (${recentLabel})</h3>
       ${zeroRecent.length===0
         ? `<p style="color:var(--text-muted)">ทุกคณะมีการเบิกจ่ายในเดือน${recentLabel}</p>`
-        : `<ul class="anomaly-list">${zeroRecent.map(f=>`
-          <li class="anomaly-item">
-            <div class="anomaly-icon icon-zero">⭕</div>
-            <div class="anomaly-body">
-              <strong>คณะ ${f.code}</strong>
-              <span>งบรวม ${fmt(f.budget+f.midYear)} บาท — ไม่มีการเบิกจ่ายในเดือน${recentLabel}</span>
-            </div>
-          </li>`).join('')}</ul>`}
+        : `<ul class="anomaly-list">${zeroRecent.map(f=>`<li class="anomaly-item"><div class="anomaly-icon icon-zero">⭕</div><div class="anomaly-body"><strong>คณะ ${f.code}</strong><span>งบรวม ${fmt(f.budget+f.midYear)} บาท — ไม่มีการเบิกจ่ายในเดือน${recentLabel}</span></div></li>`).join('')}</ul>`}
     </div>
-
     <div class="anomaly-card">
       <h3><span class="icon-dot" style="background:#6faed9"></span>คณะที่มียอดผูกพันสูงสุด (Top 6)</h3>
-      <ul class="anomaly-list">${bigComm.map(f=>`
-        <li class="anomaly-item">
-          <div class="anomaly-icon icon-spike">📎</div>
-          <div class="anomaly-body">
-            <strong>คณะ ${f.code}</strong>
-            <span>ผูกพัน ${fmt(f.committed)} บาท (${f.totalActComm>0?pct(f.committed/f.totalActComm*100):'–'} ของยอดรวม)</span>
-          </div>
-        </li>`).join('')}
-      </ul>
+      <ul class="anomaly-list">${bigComm.map(f=>`<li class="anomaly-item"><div class="anomaly-icon icon-spike">📎</div><div class="anomaly-body"><strong>คณะ ${f.code}</strong><span>ผูกพัน ${fmt(f.committed)} บาท (${f.totalActComm>0?pct(f.committed/f.totalActComm*100):'–'} ของยอดรวม)</span></div></li>`).join('')}</ul>
     </div>`;
 }
 
-function buildProgressAndStats(faculties, totalRow) {
-  const recentIdx = getCurrentFiscalMonthIndex();
-  const totalBudget = totalRow.budget + totalRow.midYear;
-  const totalDisb = totalRow.totalActComm;
-  const actualPct = totalBudget > 0 ? (totalDisb / totalBudget * 100) : 0;
-  const expectedPct = ((recentIdx + 1) / 12) * 100;
-  const diff = actualPct - expectedPct;
-  const diffColor = diff >= 0 ? '#6abf8e' : '#e8b86a';
-  const diffText = diff >= 0 ? `+${diff.toFixed(1)}% เร็วกว่าเป้า` : `${diff.toFixed(1)}% ช้ากว่าเป้า`;
-
-  document.getElementById('yearProgressWrap').innerHTML = `
-    <div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:var(--fs-xs);margin-bottom:4px">
-        <span style="color:var(--text-secondary);font-weight:600">เบิกจ่ายจริง</span>
-        <span style="font-weight:700;color:var(--accent-1)">${actualPct.toFixed(1)}%</span>
-      </div>
-      <div style="height:12px;background:var(--accent-4);border-radius:6px;overflow:hidden">
-        <div style="height:100%;width:${Math.min(100,actualPct)}%;background:var(--accent-1);border-radius:6px;transition:width 0.6s"></div>
-      </div>
-    </div>
-    <div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:var(--fs-xs);margin-bottom:4px">
-        <span style="color:var(--text-secondary);font-weight:600">เป้าหมาย ณ เดือนนี้ (${recentIdx+1}/12 เดือน)</span>
-        <span style="font-weight:700;color:var(--text-muted)">${expectedPct.toFixed(1)}%</span>
-      </div>
-      <div style="height:12px;background:var(--accent-4);border-radius:6px;overflow:hidden">
-        <div style="height:100%;width:${Math.min(100,expectedPct)}%;background:#b0c8e0;border-radius:6px"></div>
-      </div>
-    </div>
-    <div style="text-align:center;font-size:var(--fs-xs);font-weight:700;color:${diffColor};
-      background:${diff>=0?'#e6f7ef':'#fef3e2'};padding:6px 14px;border-radius:8px;display:inline-block">
-      ${diffText}
-    </div>`;
-
-  const pcts = faculties.map(f=>f.pctDisb).filter(v=>v>0).sort((a,b)=>a-b);
-  const median = pcts.length % 2 === 0
-    ? (pcts[pcts.length/2-1]+pcts[pcts.length/2])/2
-    : pcts[Math.floor(pcts.length/2)];
-  const mean = pcts.reduce((s,v)=>s+v,0)/pcts.length;
-  const std = Math.sqrt(pcts.reduce((s,v)=>s+Math.pow(v-mean,2),0)/pcts.length);
-  const maxF = faculties.reduce((a,b)=>a.pctDisb>b.pctDisb?a:b);
-  const minF = faculties.filter(f=>f.pctDisb>0).reduce((a,b)=>a.pctDisb<b.pctDisb?a:b);
-
-  const normalCount = faculties.filter(f=>f.pctDisb>=30&&f.pctDisb<=100).length;
-
-const stats = [
-    { label:'Median % เบิกจ่าย', value: median.toFixed(1)+'%', color:'var(--accent-1)' },
-    { label:'Mean % เบิกจ่าย', value: mean.toFixed(1)+'%', color:'var(--accent-2)' },
-    { label:'Std. Deviation', value: std.toFixed(1)+'%', color:'var(--text-secondary)' },
-    { label:'คณะที่อยู่ในเกณฑ์ปกติ (30–100%)', value: normalCount+' คณะ', color:'#6abf8e' },
-    { label:`สูงสุด — คณะ ${maxF.code}`, value: maxF.pctDisb.toFixed(1)+'%', color:'#e07070' },
-    { label:`ต่ำสุด — คณะ ${minF.code}`, value: minF.pctDisb.toFixed(1)+'%', color:'#e8b86a' },
-  ];
-
-  document.getElementById('quickStats').innerHTML = stats.map(s=>`
-    <div style="background:var(--surface-2);border-radius:var(--radius-sm);padding:12px 14px">
-      <div style="font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:4px">${s.label}</div>
-      <div style="font-size:var(--fs-lg);font-weight:700;color:${s.color}">${s.value}</div>
-    </div>`).join('');
-}
-
+/* ─── Full data table ─── */
 function buildTable(faculties, totalRow) {
   const activeMonths = MONTHS.map((m,i)=>({m,i})).filter(({i})=>
     faculties.some(f=>f.monthly[i]>0) || (totalRow.monthly[i]>0)
   );
-
   document.getElementById('table-head').innerHTML = `<tr>
-    <th>รหัสคณะ</th>
-    <th>คณะ/ส่วนงาน</th>
-    <th>แผนงบประมาณ (บาท)</th>
-    <th>เพิ่มเติมกลางปี (บาท)</th>
-    <th>งบรวม (บาท)</th>
-    <th>รวมเบิก+ผูกพัน (บาท)</th>
+    <th>รหัสคณะ</th><th>คณะ/ส่วนงาน</th>
+    <th>แผนงบประมาณ (บาท)</th><th>เพิ่มเติมกลางปี (บาท)</th>
+    <th>งบรวม (บาท)</th><th>รวมเบิก+ผูกพัน (บาท)</th>
     <th>% เบิกจ่าย</th>
     ${activeMonths.map(({m})=>`<th>${m}</th>`).join('')}
-    <th>ผูกพัน (บาท)</th>
-  </tr>`;
+    <th>ผูกพัน (บาท)</th></tr>`;
 
   const tBudget = totalRow.budget + totalRow.midYear;
   let html = `<tr class="total-row">
     <td>รวม</td><td>รวมมหาวิทยาลัยมหิดล</td>
     <td>${fmt(totalRow.budget)}</td><td>${fmt(totalRow.midYear)}</td>
     <td>${fmt(tBudget)}</td><td>${fmt(totalRow.totalActComm)}</td>
-    <td class="pct-bar-cell">
-      <div class="pct-bar-wrap">
-        <div class="pct-bar"><div class="pct-bar-fill ${totalRow.pctDisb>100?'over':''}" style="width:${Math.min(100,totalRow.pctDisb)}%"></div></div>
-        <span class="pct-num ${totalRow.pctDisb>100?'over-text':''}">${pct(totalRow.pctDisb)}</span>
-      </div>
-    </td>
+    <td class="pct-bar-cell"><div class="pct-bar-wrap"><div class="pct-bar"><div class="pct-bar-fill ${totalRow.pctDisb>100?'over':''}" style="width:${Math.min(100,totalRow.pctDisb)}%"></div></div><span class="pct-num ${totalRow.pctDisb>100?'over-text':''}">${pct(totalRow.pctDisb)}</span></div></td>
     ${activeMonths.map(({i})=>`<td>${fmt(totalRow.monthly[i])}</td>`).join('')}
-    <td>${fmt(totalRow.committed)}</td>
-  </tr>`;
+    <td>${fmt(totalRow.committed)}</td></tr>`;
 
   faculties.forEach(f => {
     const budget = f.budget + f.midYear;
@@ -739,44 +807,14 @@ function buildTable(faculties, totalRow) {
       <td><strong>${f.code}</strong></td><td>${f.name}</td>
       <td>${fmt(f.budget)}</td><td>${fmt(f.midYear)}</td>
       <td>${fmt(budget)}</td><td>${fmt(f.totalActComm)}</td>
-      <td class="pct-bar-cell">
-        <div class="pct-bar-wrap">
-          <div class="pct-bar"><div class="pct-bar-fill ${f.pctDisb>100?'over':''}" style="width:${Math.min(100,f.pctDisb)}%"></div></div>
-          <span class="pct-num ${f.pctDisb>100?'over-text':f.pctDisb<20?'low-text':''}">${pct(f.pctDisb)}</span>
-        </div>
-      </td>
+      <td class="pct-bar-cell"><div class="pct-bar-wrap"><div class="pct-bar"><div class="pct-bar-fill ${f.pctDisb>100?'over':''}" style="width:${Math.min(100,f.pctDisb)}%"></div></div><span class="pct-num ${f.pctDisb>100?'over-text':f.pctDisb<20?'low-text':''}">${pct(f.pctDisb)}</span></div></td>
       ${activeMonths.map(({i})=>`<td>${f.monthly[i]!==0?fmt(f.monthly[i]):'–'}</td>`).join('')}
-      <td>${f.committed!==0?fmt(f.committed):'–'}</td>
-    </tr>`;
+      <td>${f.committed!==0?fmt(f.committed):'–'}</td></tr>`;
   });
-
   document.getElementById('table-body').innerHTML = html;
-
-// sync top scrollbar — wait for render
-setTimeout(() => {
-  const bottom = document.getElementById('table-scroll-bottom');
-  const topInner = document.getElementById('table-scroll-top-inner');
-  const top = document.getElementById('table-scroll-top');
-
-  topInner.style.width = bottom.scrollWidth + 'px';
-
-  top.addEventListener('scroll', () => { bottom.scrollLeft = top.scrollLeft; });
-  bottom.addEventListener('scroll', () => { top.scrollLeft = bottom.scrollLeft; });
-}, 100);
-
-// sync top scrollbar
-const bottom = document.getElementById('table-scroll-bottom');
-const topInner = document.getElementById('table-scroll-top-inner');
-const top = document.getElementById('table-scroll-top');
-
-topInner.style.width = bottom.scrollWidth + 'px';
-
-top.addEventListener('scroll', () => { bottom.scrollLeft = top.scrollLeft; });
-bottom.addEventListener('scroll', () => { top.scrollLeft = bottom.scrollLeft; });
-  
-  
 }
 
+/* ─── Main load ─── */
 async function loadData() {
   document.getElementById('last-updated').textContent = 'กำลังโหลด…';
   try {
@@ -785,10 +823,10 @@ async function loadData() {
     const { faculties, totalRow } = parseRows(await res.text());
     if (!totalRow || faculties.length === 0) throw new Error('ไม่พบข้อมูลในชีต');
 
+    buildProgressCard(faculties, totalRow);
     buildKPI(totalRow, faculties);
     buildMonthlyTrend(faculties);
     buildPctChart(faculties);
-    buildProgressAndStats(faculties, totalRow);
     buildHeatmap(faculties);
     buildAnomalies(faculties);
     buildTable(faculties, totalRow);
