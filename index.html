@@ -850,44 +850,111 @@ function buildDistributionChart(faculties) {
   if (vals.length === 0) return;
 
   const mean   = vals.reduce((s,v) => s+v, 0) / vals.length;
-  const median = [...vals].sort((a,b)=>a-b)[Math.floor(vals.length/2)];
-  const std    = Math.sqrt(vals.reduce((s,v) => s + Math.pow(v-mean,2), 0) / vals.length);
+  const sorted = [...vals].sort((a,b) => a-b);
+  const median = sorted.length % 2 === 0
+    ? (sorted[sorted.length/2-1] + sorted[sorted.length/2]) / 2
+    : sorted[Math.floor(sorted.length/2)];
+  const std = Math.sqrt(vals.reduce((s,v) => s + Math.pow(v-mean,2), 0) / vals.length);
 
-  // Build histogram bins (width = 10%)
+  // ── Histogram bins (10% wide) ──
   const BIN = 10;
-  const minV = 0, maxV = Math.ceil(Math.max(...vals) / BIN) * BIN;
+  const maxV = Math.ceil(Math.max(...vals) / BIN) * BIN;
   const bins = [];
-  for (let lo = minV; lo < maxV; lo += BIN) bins.push({ lo, hi: lo+BIN, count: 0, faculties: [] });
-  vals.forEach((v, i) => {
-    const b = bins[Math.min(Math.floor(v / BIN), bins.length - 1)];
-    if (b) { b.count++; b.faculties.push(faculties.filter(f=>f.pctDisb>0)[i]); }
+  for (let lo = 0; lo < maxV; lo += BIN)
+    bins.push({ lo, hi: lo+BIN, count: 0, members: [] });
+  const posVals = faculties.filter(f => f.pctDisb > 0);
+  posVals.forEach(f => {
+    const idx = Math.min(Math.floor(f.pctDisb / BIN), bins.length - 1);
+    bins[idx].count++;
+    bins[idx].members.push(f);
   });
 
   const binLabels = bins.map(b => `${b.lo}–${b.hi}%`);
   const binCounts = bins.map(b => b.count);
   const binColors = bins.map(b => {
     const mid = (b.lo + b.hi) / 2;
-    if (mid > 100) return 'rgba(224,112,112,0.75)';   // over budget
-    if (mid < 30)  return 'rgba(232,184,106,0.75)';   // very low
-    return 'rgba(59,130,196,0.72)';                   // normal
+    if (mid > 100) return 'rgba(224,112,112,0.75)';
+    if (mid < 30)  return 'rgba(232,184,106,0.75)';
+    return 'rgba(59,130,196,0.72)';
   });
 
-  // KDE: Gaussian kernel, bandwidth = Silverman's rule
+  // ── KDE evaluated at each bin centre ──
+  // (same x-axis as histogram → maps perfectly to category axis)
   const h = 1.06 * std * Math.pow(vals.length, -0.2);
-  const kdePoints = 120;
-  const kdeMin = Math.max(0, minV - BIN);
-  const kdeMax = maxV + BIN;
-  const kdeStep = (kdeMax - kdeMin) / kdePoints;
-  const kdeX = [], kdeY = [];
-  for (let i = 0; i <= kdePoints; i++) {
-    const x = kdeMin + i * kdeStep;
-    const y = vals.reduce((s, v) => s + Math.exp(-0.5 * Math.pow((x-v)/h, 2)) / (h * Math.sqrt(2*Math.PI)), 0) / vals.length;
-    kdeX.push(x);
-    kdeY.push(y * vals.length * BIN); // scale to match histogram y-axis (count)
+  const kdeCentres = bins.map(b => (b.lo + b.hi) / 2);
+  const kdeY = kdeCentres.map(x =>
+    vals.reduce((s,v) => s + Math.exp(-0.5*Math.pow((x-v)/h,2)) / (h*Math.sqrt(2*Math.PI)), 0)
+    / vals.length * vals.length * BIN   // scale to count axis
+  );
+
+  // ── Vertical line plugin (afterDraw) ──
+  // Converts a % value → canvas x by interpolating between bin centres
+  function pctToCanvasX(chart, pctVal) {
+    const xScale = chart.scales.x;
+    // Find which bin index this value falls between
+    const fracIdx = (pctVal / BIN) - 0.5; // bin centre offset
+    return xScale.getPixelForValue(fracIdx);
   }
 
-  mkChart('distChart', {
+  const vertLinesPlugin = {
+    id: 'vertLines',
+    afterDraw(chart) {
+      const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+      const lines = [
+        { val: mean,   color: '#3b82c4', dash: [7,4], label: `Mean ${mean.toFixed(1)}%` },
+        { val: median, color: '#2a7a50', dash: [4,4], label: `Median ${median.toFixed(1)}%` }
+      ];
+      lines.forEach(({ val, color, dash, label }) => {
+        // Map pct value to pixel: bin index = val/BIN, centre of that bin
+        const binIdx = Math.min(val / BIN - 0.5, bins.length - 1);
+        const px = x.getPixelForValue(binIdx);
+        ctx.save();
+        ctx.setLineDash(dash);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(px, top);
+        ctx.lineTo(px, bottom);
+        ctx.stroke();
+        // Label
+        ctx.setLineDash([]);
+        ctx.fillStyle = color;
+        ctx.font = 'bold 12px IBM Plex Sans Thai, sans-serif';
+        ctx.textAlign = px > chart.width * 0.7 ? 'right' : 'left';
+        ctx.fillText(label, px + (ctx.textAlign === 'left' ? 5 : -5), top + 14);
+        ctx.restore();
+      });
+    }
+  };
+
+  // Dummy datasets for legend only (no actual points)
+  const legendOnlyDatasets = [
+    {
+      type: 'line',
+      label: `Mean (${mean.toFixed(1)}%)`,
+      data: [],
+      borderColor: '#3b82c4',
+      borderWidth: 2.5,
+      borderDash: [7,4],
+      pointRadius: 0
+    },
+    {
+      type: 'line',
+      label: `Median (${median.toFixed(1)}%)`,
+      data: [],
+      borderColor: '#2a7a50',
+      borderWidth: 2.5,
+      borderDash: [4,4],
+      pointRadius: 0
+    }
+  ];
+
+  const c = document.getElementById('distChart');
+  if (!c) return;
+  if (c._chart) c._chart.destroy();
+  c._chart = new Chart(c, {
     type: 'bar',
+    plugins: [vertLinesPlugin],
     data: {
       labels: binLabels,
       datasets: [
@@ -899,73 +966,49 @@ function buildDistributionChart(faculties) {
           borderColor: binColors.map(c => c.replace('0.72','1').replace('0.75','1')),
           borderWidth: 1.5,
           borderRadius: 4,
-          order: 2,
-          yAxisID: 'y'
+          order: 2
         },
         {
           type: 'line',
           label: 'KDE (รูปร่างการกระจายจริง)',
-          data: kdeX.map((x, i) => ({ x, y: kdeY[i] })),
+          data: kdeY,
           borderColor: '#c0392b',
-          backgroundColor: 'rgba(192,57,43,0.08)',
+          backgroundColor: 'rgba(192,57,43,0.07)',
           borderWidth: 2.5,
           pointRadius: 0,
-          tension: 0.4,
+          tension: 0.45,
           fill: true,
-          order: 1,
-          yAxisID: 'y',
-          parsing: false
+          order: 1
         },
-        {
-          // Mean vertical line — fake scatter with two points
-          type: 'line',
-          label: `Mean (${mean.toFixed(1)}%)`,
-          data: [{ x: mean, y: 0 }, { x: mean, y: Math.max(...kdeY) * 1.15 }],
-          borderColor: '#3b82c4',
-          borderWidth: 2,
-          borderDash: [6, 4],
-          pointRadius: 0,
-          order: 0,
-          yAxisID: 'y',
-          parsing: false
-        },
-        {
-          // Median vertical line
-          type: 'line',
-          label: `Median (${median.toFixed(1)}%)`,
-          data: [{ x: median, y: 0 }, { x: median, y: Math.max(...kdeY) * 1.15 }],
-          borderColor: '#2a7a50',
-          borderWidth: 2,
-          borderDash: [4, 4],
-          pointRadius: 0,
-          order: 0,
-          yAxisID: 'y',
-          parsing: false
-        }
+        ...legendOnlyDatasets
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { labels: { font: { size: 13 }, boxWidth: 24 } },
+        legend: {
+          labels: { font: { size: 13 }, boxWidth: 28,
+            filter: item => item.datasetIndex < 4  // show all 4
+          }
+        },
         tooltip: {
+          filter: ctx => ctx.datasetIndex <= 1,  // only bars + KDE
           callbacks: {
-            title: ctx => ctx[0]?.dataset?.type === 'bar' ? `ช่วง ${ctx[0].label}` : '',
+            title: ctx => `ช่วง ${ctx[0].label}`,
             label: ctx => {
-              if (ctx.dataset.type === 'bar') {
+              if (ctx.datasetIndex === 0) {
                 const b = bins[ctx.dataIndex];
-                const names = (b?.faculties||[]).map(f=>`คณะ ${f.code} (${f.pctDisb.toFixed(1)}%)`).join(', ');
-                return [`${ctx.parsed.y} คณะ`, names ? `  ${names}` : ''];
+                const names = b.members.map(f=>`คณะ ${f.code} (${f.pctDisb.toFixed(1)}%)`).join(', ');
+                return [`${ctx.parsed.y} คณะ`, names || ''];
               }
-              return ctx.dataset.label;
+              return `KDE: ${ctx.parsed.y.toFixed(2)}`;
             }
           }
         }
       },
       scales: {
         x: {
-          type: 'category',
           ticks: { font: { size: 12 }, maxRotation: 45 },
           grid: { display: false },
           title: { display: true, text: '% เบิกจ่าย', font: { size: 13 } }
@@ -979,19 +1022,19 @@ function buildDistributionChart(faculties) {
     }
   });
 
-  // Auto-insight text
-  const skew = mean > median ? 'เบ้ขวา (right-skewed)' : mean < median ? 'เบ้ซ้าย (left-skewed)' : 'สมมาตร';
-  const skewExplain = mean > median
+  // ── Auto-insight ──
+  const skew = mean > median+1 ? 'เบ้ขวา (right-skewed)' : mean < median-1 ? 'เบ้ซ้าย (left-skewed)' : 'ค่อนข้างสมมาตร';
+  const skewExplain = mean > median+1
     ? 'มีคณะที่เบิกจ่ายสูงผิดปกติดึง Mean ขึ้น — Median สะท้อนคณะทั่วไปได้ดีกว่า'
-    : mean < median ? 'มีคณะที่เบิกจ่ายต่ำผิดปกติดึง Mean ลง'
+    : mean < median-1 ? 'มีคณะที่เบิกจ่ายต่ำมากดึง Mean ลง — Median สะท้อนคณะทั่วไปได้ดีกว่า'
     : 'Mean และ Median ใกล้เคียงกัน การกระจายค่อนข้างสมมาตร';
   const overCount  = vals.filter(v => v > 100).length;
   const underCount = vals.filter(v => v < 30).length;
   document.getElementById('dist-insight').innerHTML =
-    `📊 <strong>การแปลผล:</strong> การกระจายมีลักษณะ <strong>${skew}</strong> — ${skewExplain} &nbsp;·&nbsp; `+
-    `Std Dev = <strong>${std.toFixed(1)}%</strong> บ่งชี้ความเหลื่อมล้ำสูงระหว่างคณะ &nbsp;·&nbsp; `+
+    `📊 <strong>การแปลผล:</strong> การกระจายมีลักษณะ <strong>${skew}</strong> — ${skewExplain} &nbsp;·&nbsp; ` +
+    `Std Dev = <strong>${std.toFixed(1)}%</strong> บ่งชี้ความเหลื่อมล้ำระหว่างคณะ &nbsp;·&nbsp; ` +
     (overCount  ? `<span style="color:var(--danger)">⚠ ${overCount} คณะเกินงบ (&gt;100%)</span> &nbsp;·&nbsp; ` : '') +
-    (underCount ? `<span style="color:var(--warning)">⚠ ${underCount} คณะเบิกจ่ายต่ำมาก (&lt;30%)</span>` : '✓ ไม่มีคณะต่ำกว่า 30%');
+    (underCount ? `<span style="color:var(--warning)">⚠ ${underCount} คณะต่ำมาก (&lt;30%)</span>` : '✓ ไม่มีคณะต่ำกว่า 30%');
 }
 
 /* ─── Main load ─── */
